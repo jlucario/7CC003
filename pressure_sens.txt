@@ -1,0 +1,24 @@
+int vOutMinus, vOutPlus, x, pressure_mbar, pressure_kPa;
+
+analogReference(DEFAULT);
+delay(20);   // wait, there could be a capacitor at AVref.
+
+vOutPlus = analogRead(0);
+vOutMinus = analogRead(1);
+
+// Calculation the pressure for 10% accuracy.
+// Valid for -500 mbar to +600 mbar (-50kPa to +60kPa).
+
+x = (vOutMinus-vOutPlus) + 5; // difference and offset.
+
+// Curve fitting by trial and error for the SPX3058D
+if (x > 0)
+  pressure_mbar = (x*5) + (x*x/13); 
+else
+  pressure_mbar = (x*4) - (x*x/24);
+
+pressure_kPa = pressure_mbar / 10;
+
+Serial.print (F("Pressure = "));
+Serial.print(pressure_mbar,DEC);
+Serial.println(F(" mbar"));
